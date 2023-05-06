@@ -8,8 +8,6 @@ services:
       - /app/node_modules #WOKDIR이 /app 이니까 /app으로 시작
       - ./frontend:/app
     stdin_open: true
-    networks:
-      - backbone
 
   nginx:
     restart: always
@@ -18,8 +16,6 @@ services:
       context: ./nginx
     ports:
       - '3000:80'
-    networks:
-      - backbone
 
   backend:
     build:
@@ -29,8 +25,6 @@ services:
     volumes:
       - /app/node_modules
       - ./backend:/app
-    networks:
-      - backbone
 
   mysql:
     build: ./mysql
@@ -42,11 +36,8 @@ services:
       - ./mysql/mysql_data:/var/lib/mysql
       - ./mysql/sqls/:/docker-entrypoint-initdb.d/
     environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: gerrard
-      MYSQL_DATABASE: my_app
-    networks:
-      - backbone
-
-networks:
-  backbone:
-    driver: bridge
+      MYSQL_DATABASE: myapp
+      MYSQL_PORT: 3306

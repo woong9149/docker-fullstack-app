@@ -1,0 +1,38 @@
+language: generic
+
+sudo: required
+
+services:
+  - docker # 2
+
+before_install:
+  - docker build -t gerrard/react-test-app -f ./frontend/Dockerfile.dev ./frontend #3
+
+script:
+  - docker run -e CI=true gerrard/react-test-app npm run test #4
+
+after_success: #5
+  - docker build -t gerrard/docker-frontend ./frontend
+  - docker build -t gerrard/docker-backend ./backend
+  - docker build -t gerrard/docker-nginx ./nginx
+  #6
+  - echo "$DOCKER_HUB_PASSWORD | docker login -u "$DOCKER_HUB_ID" --password-stdin
+  #7
+  - docker push gerrard/docker-frontend
+  - docker push gerrard/docker-backend
+  - docker push gerrard/docker-nginx
+
+deploy:
+  provider: elasticbeanstalk
+  region: "ap-northeast-2"
+  app: "docker-fullstack-app"
+  env: "DockerFullstackApp-env"
+  bucket_name: "elasticbeanstalk-ap-southeast-2-055068224825"
+  bucket_path: "docker-fullstack-app"
+  on:
+    branch: master
+
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+
+  

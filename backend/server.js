@@ -16,6 +16,7 @@ db.pool.query(`CREATE TABLE list (
        value TEXT,
        PRIMARY KEY (id))`,
   (err, results, fields) => {
+  console.log('err: ', err);
   console.log('results: ', results);
 });
 
@@ -34,7 +35,9 @@ app.get('/api/values', function(req,res) {
 // 클라이언트에서 입력한 값을 DB list 테이블에 넣어주기
 app.post('/api/value', function (req, res, next) {
   // DB에 값 넣어주기
-  db.pool.query(`INSERT INTO list (value) VALUES (${req.body.value})`,
+  console.log('test: ');
+  console.log(req.body);
+  db.pool.query(`INSERT INTO list (value) VALUES ("${req.body.value}")`,
     (err, results, fields) => {
       if(err)
         return res.status(500).send(err)
